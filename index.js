@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const dns = require('dns');
+const url = require('url').URL;
 const bodyParser = require('body-parser');
 
 const urlMap = [];
@@ -24,7 +25,9 @@ app.get('/', function(req, res) {
 // Your first API endpoint
 app.post('/api/shorturl', function(req, res) {
 
-  dns.lookup(req.body.url, (err, addr, family) => {
+
+  const hostname = new url(req.body.url).hostname
+  dns.lookup(hostname, 4, (err, addr, family) => {
     if(err) {
      return res.json({ error: 'invalid url' });
     }
