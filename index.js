@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const url = require('url').URL;
+const dns = require('dns');
 const bodyParser = require('body-parser');
 
 const urlMap = [];
@@ -24,17 +24,18 @@ app.get('/', function(req, res) {
 // Your first API endpoint
 app.post('/api/shorturl', function(req, res) {
 
-  try {
-    new url(req.body.url);
+  dns.lookup(req.body.url, (err, addr, family) => {
+    if(err) {
+     return res.json({ error: 'invalid url' });
+    }
     const urlItem ={
-      original_url : req.body.url,  short_url : urlMap.length + 1
+      original_url: req.body.url,  short_url: urlMap.length + 1
     };
     urlMap.push(urlItem)
 
     return  res.json(urlItem);
-  } catch(err) {
-    res.json({ error: 'invalid url' });
-  }
+  })  
+  
 });
 
 app.get('/api/shorturl/:short', function(req, res) {
